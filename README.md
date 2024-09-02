@@ -51,4 +51,4 @@ Use the `connect_agents(agent_a, agent_b)` function to enable bidirectional mess
 To run the agents, execute the `autonomous_agent.py` script:
 
 ```bash
-python3 autonomous_agent.py
+python autonomous_agent.py
