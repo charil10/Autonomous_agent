@@ -1,40 +1,54 @@
-Autonomous Agent System This project implements a basic autonomous agent framework with reactive and proactive behavior capabilities. The agents can handle incoming messages, generate behaviors, and interact with each other in a simulated environment.
+# Autonomous Agent Project
 
+## Overview
 
-Overview The system consists of two main components:
+This project involves the implementation of an autonomous agent system in Python. The system includes:
 
-AutonomousAgent Class: A base class that provides the core functionalities for handling messages, registering handlers, and executing behaviors.
+- An `AutonomousAgent` class that supports asynchronous messaging, reactiveness, and proactiveness.
+- A `ConcreteAgent` class with specific behaviors and handlers.
+- Two agents that communicate with each other via their inbox and outbox.
+- Unit and integration tests to ensure correct functionality.
 
-ConcreteAgent Class: A subclass of AutonomousAgent that implements specific behaviors and message handling logic. This agent generates random messages and handles those containing the word "hello."
+## Features
 
-Features Message Handling: Agents can receive messages and process them based on registered handlers. Behavior Execution: Agents can perform proactive behaviors at defined intervals. Duplicate Message Detection: Ensures that duplicate messages are not processed multiple times. Concurrent Execution: Agents run their message-handling and behavior-execution loops concurrently using threads. Graceful Shutdown: Agents can be stopped cleanly, halting all operations. How It Works Agent Initialization: Each agent is created with a unique name and can register handlers and behaviors. Message Handling: Messages are consumed from the inbox and processed by the corresponding handler if registered. Behavior Execution: Behaviors are executed in a loop, generating messages or performing other actions. Communication: Agents communicate by emitting messages into each other’s inboxes, allowing for dynamic interaction.
+- **Asynchronous Messaging:** Agents communicate via queues, allowing asynchronous message passing.
+- **Reactiveness:** Agents handle incoming messages using registered handlers.
+- **Proactiveness:** Agents generate and send messages based on predefined behaviors.
+- **Bidirectional Communication:** Two agents can exchange messages with each other.
 
-Example:# Create two agent instances agent1 = ConcreteAgent("Agent1") agent2 = ConcreteAgent("Agent2")
+## Classes
 
-Link inbox and outbox between agents for bidirectional communication
-agent1.outbox = agent2.inbox agent2.outbox = agent1.inbox
+### `AutonomousAgent`
 
-Start agent threads
-threading.Thread(target=agent1.consume_messages, daemon=True).start() threading.Thread(target=agent1.run_behaviors, daemon=True).start() threading.Thread(target=agent2.consume_messages, daemon=True).start() threading.Thread(target=agent2.run_behaviors, daemon=True).start()
+- **Attributes:**
+  - `name`: The name of the agent.
+  - `inbox`: A queue for incoming messages.
+  - `outbox`: A queue for outgoing messages.
+  - `handlers`: A dictionary mapping message types to handler functions.
+  - `behaviors`: A list of proactive behaviors.
 
-Allow agents to run for a set time before stopping
-time.sleep(10)
+- **Methods:**
+  - `register_handler(message_type, handler)`: Register a message handler for a given type.
+  - `register_behavior(behavior)`: Register a proactive behavior.
+  - `send_message(message)`: Send a message to the outbox.
+  - `receive_message()`: Consume messages from the inbox and handle them.
+  - `execute_behaviors()`: Execute proactive behaviors based on internal state or time.
+  - `start()`: Start message handling and behavior execution in separate threads.
+  - `stop()`: Stop the agent.
 
-Stop agents gracefully
-agent1.stop() agent2.stop()
+### `ConcreteAgent` (inherits from `AutonomousAgent`)
 
-Design Choices and Feedback Design Choices: Concurrency: Threading was used to allow simultaneous execution of message handling and behavior execution. This decision ensures that the agent remains responsive and can perform tasks independently.
+- **Initialization:**
+  - Registers a handler for messages with the keyword "hello" that prints the message.
+  - Registers a behavior that generates random 2-word messages every 2 seconds.
 
-Duplicate Message Detection: A simple list check was implemented in the emit_message function to avoid processing the same message multiple times. This approach works efficiently in this context but might need optimization for larger-scale scenarios.
+## Connecting Agents
 
-Behavior and Message Registration: Behaviors and handlers are registered dynamically, allowing the agent to be easily extended with new functionalities.
+Use the `connect_agents(agent_a, agent_b)` function to enable bidirectional message transfer between two agents.
 
-Error Logging: Instead of raising exceptions, the design favors logging messages when errors or unexpected scenarios occur, such as missing handlers or empty messages. This approach keeps the agent robust and avoids crashing during execution.
+## Running the Agents
 
-Feedback on Design: Scalability: The current implementation works well for small-scale, controlled environments. For larger applications, consider using queues instead of lists for inboxes and outboxes to manage concurrency more effectively.
+To run the agents, execute the `autonomous_agent.py` script:
 
-Message Prioritization: Future versions could benefit from prioritizing messages to handle urgent tasks more efficiently, which would require adjustments to the message handling loop.
-
-Graceful Exit: A more sophisticated shutdown mechanism might be needed for agents with complex or long-running behaviors.
-
-Error Handling: While logging errors provides insight, implementing recovery strategies or fallbacks could make the agent more resilient, especially in unpredictable environments.
+```bash
+python3 autonomous_agent.py
